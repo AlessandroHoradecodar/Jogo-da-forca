@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Forca</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            text-align: center;
+        }
+
+        #container {
+            margin: 50px auto;
+            width: 400px;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        #word-display {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        #letters-guess {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        #guess-input {
+            padding: 5px;
+            font-size: 18px;
+            width: 30px;
+            text-transform: uppercase;
+        }
+
+        #guess-button {
+            padding: 5px 10px;
+            font-size: 18px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        #message {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 20px;
+        }
+
+        .hangman-container {
+            width: 200px;
+            height: 200px;
+            position: relative;
+            margin: 20px auto;
+        }
+
+        .gallows {
+            width: 10px;
+            height: 100%;
+            background-color: #222;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .beam {
+            width: 80px;
+            height: 10px;
+            background-color: #222;
+            position: absolute;
+            top: 0;
+            left: 10%;
+        }
+
+        .noose {
+            width: 10px;
+            height: 30px;
+            background-color: #222;
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .head {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #222;
+            position: absolute;
+            top: 30%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+        }
+
+        .body {
+            width: 10px;
+            height: 80px;
+            background-color: #222;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+        }
+
+        .left-arm,
+        .right-arm {
+            width: 50px;
+            height: 10px;
+            background-color: #222;
+            position: absolute;
+            top: 60%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+        }
+
+        .left-leg,
+        .right-leg {
+            width: 20px;
+            height: 100px;
+            background-color: #222;
+            position: absolute;
+            top: 75%;
+            left: 50%;
+            transform: translteX(-50%);
+            display: none;
+        }
+
+        .left-foot,
+        .right-foot {
+            width: 40px;
+            height: 10px;
+            background-color: #222;
+            position: absolute;
+            top: 95%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+        }
+
+       
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>Jogo da Forca</h1>
+        <div id="word-display"></div>
+        <div id="letters-guess"></div>
+        <div class="hangman-container">
+            <div class="gallows"></div>
+            <div class="beam"></div>
+            <div class="noose"></div>
+            <div class="head"></div>
+            <div class="body"></div>
+            <div class="left-arm"></div>
+            <div class="right-arm"></div>
+            <div class="left-leg"></div>
+            <div class="right-leg"></div>
+            <div class="left-foot"></div>
+            <div class="right-foot"></div>
+        </div>
+        <p>Chances restantes: <span id="chances">6</span></p>
+        <input type="text" id="guess-input" maxlength="1">
+        <button id="guess-button">Adivinhar</button>
+        <div id="message"></div>
+        <div id="keyboard">
+            <button onclick="guessLetter('A')">A</button>
+            <button onclick="guessLetter('B')">B</button>
+            <button onclick="guessLetter('C')">C</button>
+            <button onclick="guessLetter('D')">D</button>
+            <button onclick="guessLetter('E')">E</button>
+            <button onclick="guessLetter('F')">F</button>
+            <button onclick="guessLetter('G')">G</button>
+            <button onclick="guessLetter('H')">H</button>
+            <button onclick="guessLetter('I')">I</button>
+            <button onclick="guessLetter('J')">J</button>
+            <button onclick="guessLetter('K')">K</button>
+            <button onclick="guessLetter('L')">L</button>
+            <button onclick="guessLetter('M')">M</button>
+            <button onclick="guessLetter('N')">N</button>
+            <button onclick="guessLetter('O')">O</button>
+            <button onclick="guessLetter('P')">P</button>
+            <button onclick="guessLetter('Q')">Q</button>
+            <button onclick="guessLetter('R')">R</button>
+            <button onclick="guessLetter('S')">S</button>
+            <button onclick="guessLetter('T')">T</button>
+            <button onclick="guessLetter('U')">U</button>
+            <button onclick="guessLetter('V')">V</button>
+            <button onclick="guessLetter('W')">W</button>
+            <button onclick="guessLetter('X')">X</button>
+            <button onclick="guessLetter('Y')">Y</button>
+            <button onclick="guessLetter('Z')">Z</button>
+        </div>
+    </div>
+
+    <script>
+        const words = ["PROGRAMACAO", "DESENVOLVIMENTO", "JAVASCRIPT", "HTML", "CSS"];
+        let chosenWord = "";
+        let guessedLetters = [];
+        let attempts = 6;
+
+        function startGame() {
+            chosenWord = words[Math.floor(Math.random() * words.length)];
+            guessedLetters = [];
+            attempts = 6;
+            updateWordDisplay();
+            updateLettersGuessed();
+            updateMessage("");
+            updateChances();
+            resetHangman();
+        }
+
+        function updateWordDisplay() {
+            const wordDisplay = document.getElementById("word-display");
+            let displayText = "";
+            for (const letter of chosenWord) {
+                if (guessedLetters.includes(letter)) {
+                    displayText += letter + " ";
+                } else {
+                    displayText += "_ ";
+                }
+            }
+            wordDisplay.textContent = displayText;
+            if (!displayText.includes("_")) {
+                updateMessage("Parabéns! Você venceu!");
+                setTimeout(startGame, 3000); // Reiniciar o jogo após 3 segundos
+            }
+        }
+
+        function updateLettersGuessed() {
+            const lettersGuessed = document.getElementById("letters-guess");
+            lettersGuessed.textContent = "Letras adivinhadas: " + guessedLetters.join(", ");
+        }
+
+        function updateMessage(message) {
+            const messageDiv = document.getElementById("message");
+            messageDiv.textContent = message;
+        }
+
+        function updateChances() {
+            const chancesSpan = document.getElementById("chances");
+            chancesSpan.textContent = attempts;
+        }
+
+        function resetHangman() {
+            const hangmanParts = document.querySelectorAll(".hangman-container div");
+            hangmanParts.forEach(part => {
+                part.style.display = "none";
+            });
+        }
+
+        function guessLetter(letter) {
+            const guessInput = document.getElementById("guess-input");
+            guessInput.value = letter.toUpperCase();
+
+            if (guessedLetters.includes(letter)) {
+                updateMessage("Você já adivinhou essa letra.");
+                return;
+            }
+
+            guessedLetters.push(letter);
+
+            if (!chosenWord.includes(letter)) {
+                attempts--;
+                showHangmanPart(6 - attempts);
+                if (attempts === 0) {
+                    updateMessage("Você perdeu! A palavra era: " + chosenWord);
+                    setTimeout(startGame, 3000); // Reiniciar o jogo após 3 segundos
+                    return;
+                }
+            }
+
+            updateWordDisplay();
+            updateLettersGuessed();
+            updateChances();
+        }
+
+        function disableGuessing() {
+            const guessInput = document.getElementById("guess-input");
+            const guessButton = document.getElementById("guess-button");
+            guessInput.disabled = true;
+            guessButton.disabled = true;
+        }
+
+        function showHangmanPart(stage) {
+            const hangmanPart = document.querySelectorAll(".hangman-container div")[stage - 1];
+            hangmanPart.style.display = "block";
+        }
+
+        document.getElementById("guess-button").addEventListener("click", () => {
+            const guessInput = document.getElementById("guess-input");
+            const guess = guessInput.value;
+            if (guess.length === 1 && /[A-Z]/.test(guess)) {
+                guessLetter(guess);
+            } else {
+                updateMessage("Por favor, insira uma letra válida.");
+            }
+            guessInput.value = "";
+        });
+
+        startGame();
+    </script>
+</body>
+</html>
